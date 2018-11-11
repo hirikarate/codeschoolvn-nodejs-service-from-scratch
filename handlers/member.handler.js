@@ -149,11 +149,7 @@ exports.onMemberDetailRoute = async function (req) {
         // content = content.replace(`@${prop}@`, member[prop]);
         let value
         if (prop === 'isGraduated') {
-            value = 'checked'
-        }
-        // if vs else if
-        else if (prop === 'hobbies') {
-            value = 'checked'
+            value = member[prop] ? 'checked' : ''
         }
         else {
             value = member[prop]
