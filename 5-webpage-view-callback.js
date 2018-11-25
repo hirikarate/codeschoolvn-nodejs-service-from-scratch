@@ -14,13 +14,13 @@ const MEMBERS = [
 ]
 
 const onDefaultRoute = function (req, res, done) {
-    fs.readFile('views/default.html', 'utf8', (err, template) => {
+    fs.readFile('views/default.html', 'utf8', (err, html) => {
         if (err) {
             console.error(err)
             res.writeHead(500)
             return done()
         }
-        res.write(template)
+        res.write(html)
         done()
     })
 }
@@ -44,13 +44,13 @@ const onMemberListRoute = function (req, res, done) {
         `)
         .reduce((prev, cur) => prev + cur, '')
 
-    fs.readFile('views/member-list.html', 'utf8', (err, tpl) => {
+    fs.readFile('views/member-list.html', 'utf8', (err, html) => {
         if (err) {
             console.error(err)
             res.writeHead(500)
             return done()
         }
-        const content = tpl.replace('@rows@', rowStr)
+        const content = html.replace('{{rows}}', rowStr)
         res.write(content)
         done()
     })
@@ -61,37 +61,29 @@ const HANDLERS = {
     'GET /members': onMemberListRoute,
 }
 
-const server = http.createServer()
+http.createServer()
+    .on('request', (req, res) => {
+        const { method, url } = req
+        const route = `${method} ${url}`
+        const handler = HANDLERS[route]
 
-server.on('request', (req, res) => {
-    const { method, url } = req
-    const route = `${method} ${url}`
-    const handler = HANDLERS[route]
+        if (!handler) {
+            res.writeHead(404)
+            return res.end()
+        }
 
-    if (!handler) {
-        res.writeHead(404)
-        return res.end()
-    }
+        res.writeHead(200, {
+            'Content-Type': 'text/html',
+        })
 
-    // res.on('error', (err) => {
-    //     console.error('Error occured on response:', err)
-    // })
-
-    res.writeHead(200, {
-        'Content-Type': 'text/html',
+        handler(req, res, () => {
+            res.end()
+        })
     })
-    // handler(req, res) // without callback, handle 'error' event
-    handler(req, res, () => {
-        res.end()
+    .on('listening', () => {
+        console.log('Server is listening at port 3000')
     })
-})
-
-server.on('listening', () => {
-    console.log('Server is listening at port 3000')
-})
-
-server.on('error', (err) => {
-    console.error('Error occured on server:', err)
-})
-
-server.listen(3000)
+    .on('error', (err) => {
+        console.error('Error occured on server:', err)
+    })
+    .listen(3000)

@@ -4,6 +4,8 @@ const util = require('util')
 
 const readFileAsync = util.promisify(fs.readFile)
 
+class ServersideError extends Error {
+}
 
 const MEMBERS = [
     { name: 'Hoàng Anh', age: 18 },
@@ -21,6 +23,9 @@ const onDefaultRoute = function (req) {
 }
 
 const onMemberListRoute = function (req) {
+    // 3. Throw a custom general error
+    // throw new ServersideError('Custom general error')
+
     const rowStr = MEMBERS
         .map(mem => `
             <tr>
@@ -31,24 +36,28 @@ const onMemberListRoute = function (req) {
         .reduce((prev, cur) => prev + cur, '')
 
     return readFileAsync('views/member-list.html', 'utf8')
-        .then(tpl => {
-            const content = tpl.replace('@rows@', rowStr)
+        .then(html => {
+            // 2. Throw a custom Promise error
+            // throw new ServersideError('Custom Promise error')
+
+            const content = html.replace('{{rows}}', rowStr)
             return content
         })
 }
 
-const onError = function () {
+const onError = function (err) {
+    console.error('Route error:', err)
     return readFileAsync('views/error.html', 'utf8')
+        .then(html => {
+            const errMsg = (err instanceof ServersideError
+                ? err.message
+                : '')
+            const content = html.replace('{{reason}}', errMsg)
+            return content
+        })
 }
 
-const HANDLERS = {
-    'GET /': onDefaultRoute,
-    'GET /members': onMemberListRoute,
-}
-
-const server = http.createServer()
-
-server.on('request', (req, res) => {
+const requestListener = (req, res) => {
     const { method, url } = req
     const route = `${method} ${url}`
     const handler = HANDLERS[route]
@@ -58,52 +67,37 @@ server.on('request', (req, res) => {
         return res.end()
     }
 
-    res.on('error', (err) => {
-        console.error('Error occured on response:', err)
-    })
-
-    // handler(req, res)
-    //     .then(content => {
-    //         res.writeHead(200, {
-    //             'Content-Type': 'text/html',
-    //         })
-    //         res.write(content)
-    //     })
-    //     .catch(err => {
-    //         console.error('Error occured on route:', err)
-    //         res.writeHead(500)
-    //     })
-    //     .finally(() => {
-    //         res.end()
-    //     })
-
     handler(req, res)
+        .catch(onError)
         .then(content => {
             res.writeHead(200, {
                 'Content-Type': 'text/html',
             })
-            return content
+            res.write(content)
         })
         .catch(err => {
-            console.error('Error occured on route:', err)
-            return onError()
-        })
-        .then(content => res.write(content))
-        .catch(err => {
-            console.error('Error occured on Error page:', err)
+            console.error('Error Page error:', err)
             res.writeHead(500)
         })
         .finally(() => {
             res.end()
         })
-})
+}
 
-server.on('listening', () => {
-    console.log('Server is listening at port 3000')
-})
+const HANDLERS = {
+    'GET /': onDefaultRoute,
+    'GET /members': onMemberListRoute,
+}
 
-server.on('error', (err) => {
-    console.error('Error occured on server:', err)
-})
+// 1. Create a EADDRINUSE error
+// http.createServer().listen(3000)
 
-server.listen(3000)
+http.createServer()
+    .on('request', requestListener)
+    .on('listening', () => {
+        console.log('Server is listening at port 3000')
+    })
+    .on('error', (err) => {
+        console.error('Web Server error:', err)
+    })
+    .listen(3000)
