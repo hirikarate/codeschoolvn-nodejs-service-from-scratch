@@ -1,6 +1,6 @@
 
 const { parseQueryString, loadHtml } = require('../common/web-util')
-const MEMBERS = require('../data/members.data')
+const MEMBERS = require('../data/members-data')
 const Hobby = require('../models/Hobby.enum')
 const Faculty = require('../models/Faculty.enum')
 const { ServersideError } = require('../models/ServersideError')
