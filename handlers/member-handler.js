@@ -8,28 +8,14 @@ const { Member } = require('../models/Member')
 
 
 exports.onDefaultRoute = function (req, res) {
-    res.render('default')
+    res.render('default', {
+        title: 'Trang chủ',
+    })
 }
 
 exports.onMemberListRoute = function (req, res) {
-    // const rowStr = MEMBERS
-    //     .map((mem, i) => `
-    //         <tr>
-    //         <td>${mem.name}</td>
-    //         <td>${mem.age}</td>
-    //         <td><a href="/member-detail?id=${i}">Chi tiết</a></td>
-    //         </tr>
-    //     `)
-    //     .reduce((prev, cur) => prev + cur, '')
-
-    // const html = await loadHtml('member-list-mat.html')
-    // const content = html.replace('{{rows}}', rowStr)
-    // return buildResponse(content)
-    
-    // res.render('member-list', {
-    //     rows: rowStr
-    // })
     res.render('member-list', {
+        title: 'Danh sách thành viên',
         members: MEMBERS
     })
 }
@@ -59,6 +45,7 @@ exports.onMemberDetailRoute = function (reqOrMember, res, validationErrors = [])
         errors: validationErrors,
         Hobby,
         Faculty,
+        title: 'Trang chủ',
     })
 }
 

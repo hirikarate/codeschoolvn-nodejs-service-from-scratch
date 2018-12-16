@@ -1,0 +1,13 @@
+.error-list {
+    border: 1px solid #f45050;
+    border-radius: 10px;
+    padding: 10px 40px;
+}
+
+.error-list li {
+    color: #bf1b1b
+}
+
+.error-list:empty {
+    display: none;
+}
