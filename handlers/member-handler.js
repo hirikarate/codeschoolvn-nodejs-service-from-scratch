@@ -1,6 +1,6 @@
 const http = require('http')
 
-const MEMBERS = require('../data/members-data-validation')
+const MEMBERS = require('../data/members-data')
 const Hobby = require('../models/Hobby.enum')
 const Faculty = require('../models/Faculty.enum')
 const { Member } = require('../models/Member')
@@ -20,16 +20,48 @@ exports.onMemberListRoute = function (req, res) {
     })
 }
 
+function loadHobbyFromDb() {
+    const dbRows = {
+        READING: { key: 'reading', label: 'Đọc truyện ngôn tình' },
+        SWIMMING: { key: 'swimming', label: 'Tắm sông' },
+        TRAVELLING: { key: 'travelling', label: 'Đi bụi' },
+        SHOPPING: { key: 'shopping', label: 'Mua Bitcoin' },
+    }
+    return Promise.resolve(dbRows)
+}
+
+exports.onMemberCreateRoute = async function (reqOrMember, res, validationErrors = []) {
+    let member
+    if (! (reqOrMember instanceof http.IncomingMessage)) {
+        member = reqOrMember
+        member.hobbies = member.hobbies || []
+    } 
+    else { // First visit
+        member = {
+            hobbies: [],
+         }
+    }
+
+    return res.render('member-create', {
+        id: null,
+        member,
+        errors: validationErrors,
+        Hobby,
+        Faculty,
+        title: 'Thêm thành viên',
+    })
+}
 
 exports.onMemberDetailRoute = function (reqOrMember, res, validationErrors = []) {
     let member, id
     if (reqOrMember instanceof http.IncomingMessage) {
-        // const queryObj = parseQueryString(reqOrMember.url)
-        // id = parseInt(queryObj['id'])
         id = reqOrMember.query.id
 
         if (Number.isNaN(id) || !MEMBERS[id]) {
-            return res.render('error', { reason: 'Mã thành viên không tồn tại' })
+            return res.render('error', {
+                title: 'Sự cố',
+                reason: 'Mã thành viên không tồn tại' 
+            })
         }
 
         member = MEMBERS[id]
@@ -45,25 +77,39 @@ exports.onMemberDetailRoute = function (reqOrMember, res, validationErrors = [])
         errors: validationErrors,
         Hobby,
         Faculty,
-        title: 'Trang chủ',
+        title: 'Chi tiết',
     })
 }
 
 exports.onMemberSaveRoute = function (req, res) {
-    // const formData = await extractFormData(req)
     const formData = req.body
-    console.log({ formData })
+    const isEdit = (req.path === '/member-detail')
 
-    const member = MEMBERS[formData.id]
-    if (!member) {
-        return res.redirect('/')
+    if (isEdit) {
+        const member = MEMBERS[formData.id]
+        if (!member) {
+            return res.redirect('/')
+        }
+        const { errors: valErrors, data } = Member.from(formData)
+        if (valErrors) {
+            return exports.onMemberDetailRoute(formData, res, valErrors)
+        }
+        MEMBERS[formData.id] = data
+        return exports.onMemberDetailRoute(req, res)
     }
+    else { // Create new
 
-    const { errors: valErrors, data } = Member.from(formData)
-    if (valErrors) {
-        return exports.onMemberDetailRoute(formData, res, valErrors)
+        // Translate raw data to Member type
+        const { errors: valErrors, data } = Member.from(formData)
+
+        if (valErrors) {
+            return exports.onMemberCreateRoute(formData, res, valErrors)
+        }
+
+        // Add to database
+        const newId = MEMBERS.push(data) - 1
+
+        // Redirects to edit page
+        res.redirect(`/member-detail?id=${newId}`)
     }
-    MEMBERS[formData.id] = data
-
-    return exports.onMemberDetailRoute(req, res)
 }

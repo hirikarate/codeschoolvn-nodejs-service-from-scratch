@@ -56,13 +56,17 @@ webapp.get('/members', (req, res) => {
 webapp.get('/member-detail', handleRequest(member.onMemberDetailRoute))
 webapp.post('/member-detail', handleRequest(member.onMemberSaveRoute))
 
+webapp.get('/member-create', handleRequest(member.onMemberCreateRoute))
+webapp.post('/member-create', handleRequest(member.onMemberSaveRoute))
+
 webapp.use('/static', express.static(publicPath))
 
 // Handle 404
 webapp.use((req, res) => {
     res.status(400);
     res.render('error', {
-        reason: 'Anh đi xa quá!'
+        reason: 'Anh đi xa quá!',
+        title: 'Sự cố',
     });
 });
 
@@ -71,6 +75,7 @@ webapp.use((error, req, res, next) => {
     res.status(500)
     res.render('error', {
         reason: error,
+        title: 'Sự cố',
     })
 })
 

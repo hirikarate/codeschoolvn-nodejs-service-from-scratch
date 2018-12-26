@@ -1,3 +1,5 @@
 {
-    "editor.insertSpaces": true
+    "editor.insertSpaces": true,
+    "editor.fontSize": 18,
+    "workbench.colorTheme": "Default Light+"
 }

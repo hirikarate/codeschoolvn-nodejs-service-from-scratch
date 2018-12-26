@@ -8,49 +8,39 @@
 <body>
     <div class="card">
         <div class="view-cascade blue-gradient">
-            <h2>Thông tin cá nhân: <%=member.name %></h2>
+            <h2>Thêm thành viên</h2>
         </div>
         <div class="card-body">
-            <% if (errors && errors.length) { %>
-            <ul class="error-list">
-                <% errors.map(err => { %>
-                    <li><%=err %></li>
-                <% }) %>
-            </ul>
-            <% } %>
-            <form action="/member-detail?id=<%=id %>" method="POST">
-                <input type="hidden" value="<%=id %>" name="id">
+            <form action="/member-create" method="POST">
                 <label for="txtName">Họ tên</label><br>
-                <input type="text" value="<%=member.name %>" name="name" id="txtName" class="form-control"><br>
+                <input type="text" name="name" id="txtName" class="form-control"><br>
                 <br>
                 <label for="txtAge">Tuổi</label><br>
-                <input type="number" value="<%=member.age %>" name="age" id="txtAge" class="form-control"><br>
+                <input type="number" name="age" id="txtAge" class="form-control"><br>
                 <br>
                 <label for="txtAddr">Địa chỉ</label><br>
-                <textarea name="address" id="txtAddr" rows="5" class="form-control"><%=member.address %></textarea><br>
+                <textarea name="address" id="txtAddr" rows="5" class="form-control"></textarea><br>
                 <br>
-                <input type="checkbox" value="graduated" <%=(member.isGraduated ? 'checked' : '') %> name="isGraduated" id="cbGrad">
+                <input type="checkbox" value="graduated" name="isGraduated" id="cbGrad">
                 <label for="cbGrad" class="label-check">Đã tốt nghiệp</label><br>
                 <br>
                 <label>Chuyên ngành</label><br>
                 <select name="faculty" class="form-control">
                     <option value="">-- Chọn chuyên ngành --</option>
-                <% for (let fac of Object.values(Faculty)) {
-                    const selected = member.faculty == fac.key ? 'selected' : ''
-                %>
-                    <option value="<%=fac.key %>" <%=selected %> >
+                    <% for (let fac of Object.values(Faculty)) {
+                    %>
+                    <option value="<%=fac.key %>">
                         <%=fac.label %>
                     </option>
-                <% } %>
+                    <% } %>
                 </select>
                 <br>
                 <br>
                 <label>Sở thích</label><br>
                 <% for (let prop in Hobby) {
                     const hobby = Hobby[prop]
-                    const selected = member.hobbies.includes(hobby.key) ? 'checked' : ''
                 %>
-                    <input type="checkbox" value="<%=hobby.key %>" name="hobbies" id="cb<%=hobby.key%>" <%=selected %> >
+                    <input type="checkbox" value="<%=hobby.key %>" name="hobbies" id="cb<%=hobby.key%>">
                     <label for="cb<%=hobby.key %>" class="label-check">
                         <%=hobby.label %>
                     </label><br>
