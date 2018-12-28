@@ -31,7 +31,11 @@
                         <tr>
                         <td><%=mem.name%></td>
                         <td><%=mem.age%></td>
-                        <td><a href="/member-detail?id=<%=i%>">Chi tiết</a></td>
+                        <td>
+                            <a href="/member-detail?id=<%=i%>">Chi tiết</a>
+                            &nbsp;
+                            <a href="/member-delete?id=<%=i%>">Xóa sổ</a>
+                        </td>
                         </tr>
                     <% }) %>
                 </tbody>

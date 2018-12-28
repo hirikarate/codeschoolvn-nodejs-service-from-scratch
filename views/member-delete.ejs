@@ -1,0 +1,26 @@
+<html>
+
+<head>
+    <% include ./partials/head %>
+    <link rel="stylesheet" href="/static/styles/member-detail-page.css" >
+</head>
+
+<body>
+    <form action="/member-delete" method="POST" class="card">
+        <input type="hidden" value="<%=id %>" name="id">
+        <div class="view-cascade red-gradient">
+            <h2>Xác nhận xóa: <%=member.name %></h2>
+        </div>
+        <div class="card-body">
+            Họ tên: <b><%=member.name %></b><br>
+            Tuổi: <b><%=member.age %></b><br>
+            Địa chỉ: <b><%=member.address %></b>
+        </div>
+        <div class="card-footer">
+            <a href="<%=backUrl %>">&laquo; Không xóa</a> &nbsp;&nbsp;
+            <input type="submit" value="Trảm!" class="btn red-gradient">
+        </div>
+    </form>
+</body>
+
+</html>

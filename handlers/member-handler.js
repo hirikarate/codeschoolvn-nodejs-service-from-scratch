@@ -113,3 +113,41 @@ exports.onMemberSaveRoute = function (req, res) {
         res.redirect(`/member-detail?id=${newId}`)
     }
 }
+
+
+exports.onMemberConfirmDeleteRoute = function (req, res) {
+    const { id } = req.query
+
+    if (Number.isNaN(id) || !MEMBERS[id]) {
+        return res.render('error', {
+            title: 'Sự cố',
+            reason: 'Mã thành viên không tồn tại' 
+        })
+    }
+
+    const member = MEMBERS[id]
+    
+    res.render('member-delete', {
+        id,
+        member,
+        backUrl: req.headers.referer,
+        title: 'Xác nhận xóa',
+    })
+}
+
+exports.onMemberExecuteDeleteRoute = function (req, res) {
+    const { id } = req.body
+
+    if (Number.isNaN(id) || !MEMBERS[id]) {
+        return res.render('error', {
+            title: 'Sự cố',
+            reason: 'Mã thành viên không tồn tại' 
+        })
+    }
+
+    // Add to database
+    MEMBERS.splice(id, 1)
+
+    // Redirects to edit page
+    res.redirect('/members')
+}
