@@ -1,15 +1,12 @@
-const path = require('path');
-const { Stream } = require('stream');
-
 const express = require('express')
 
-const { buildPublicPath } = require('./common/web-util')
-const member = require('./handlers/member-handler')
+const { buildPublicPath, buildViewPath } = require('./common/web-util')
+const { DefaultController } = require('./controllers/DefaultController')
+const { MemberController } = require('./controllers/MemberController')
 
 
-const ROOT = process.cwd()
-const publicPath = path.join(ROOT, 'public')
-const viewPath = path.join(ROOT, 'views')
+const publicPath = buildPublicPath()
+const viewPath = buildViewPath()
 
 
 
@@ -25,44 +22,50 @@ process.on('uncaughtException', handleUnexpectedError)
 process.on('unhandledRejection', handleUnexpectedError)
 
 
-function handleRequest (handler) {
+function handleRequest (ControllerClass, action) {
     return (req, res) => {
         res.on('error', handleUnexpectedError)
-        handler(req, res)
+        const controller = new ControllerClass()
+        controller[action](req, res)
     }
-
 }
 
 const webapp = express()
 
-// Parsing form-data
+// Parsing POST form-data
 webapp.use(express.urlencoded({
     extended: true,
 }));
 
-// Parsing JSON data
+// Parsing POST JSON data
 webapp.use(express.json());
 
+// Set up view
 webapp.set('view engine', 'ejs');
 webapp.set('views', viewPath);
 
-webapp.get('/', handleRequest(member.onDefaultRoute))
 
-webapp.get('/members', (req, res) => {
-    // throw new Error('A random error')
-    handleRequest(member.onMemberListRoute)(req, res)
-})
+// Register routes
 
-webapp.get('/member-detail', handleRequest(member.onMemberDetailRoute))
-webapp.post('/member-detail', handleRequest(member.onMemberSaveRoute))
+webapp.get('/', handleRequest(DefaultController, 'homepage'))
 
-webapp.get('/member-create', handleRequest(member.onMemberCreateRoute))
-webapp.post('/member-create', handleRequest(member.onMemberSaveRoute))
+webapp.get('/members', handleRequest(MemberController, 'list'))
 
-webapp.get('/member-delete', handleRequest(member.onMemberConfirmDeleteRoute))
-webapp.post('/member-delete', handleRequest(member.onMemberExecuteDeleteRoute))
+// WHY NOT?
+// webapp.get('/members/:id', handleRequest(MemberController, 'detail'))
+// webapp.post('/members/:id', handleRequest(MemberController, 'saveEdit'))
+
+webapp.get('/members/create', handleRequest(MemberController, 'create'))
+webapp.post('/members/create', handleRequest(MemberController, 'saveNew'))
+
+webapp.get('/members/delete/:id', handleRequest(MemberController, 'confirmDelete'))
+webapp.post('/members/delete', handleRequest(MemberController, 'delete'))
+
+webapp.get('/members/:id', handleRequest(MemberController, 'detail'))
+webapp.post('/members/:id', handleRequest(MemberController, 'saveEdit'))
 
 webapp.use('/static', express.static(publicPath))
+
 
 // Handle 404
 webapp.use((req, res) => {

@@ -22,7 +22,7 @@
                 <tbody>
                     <tr>
                         <td colspan="3" style="text-align: right;">
-                            <a href="/member-create" class="btn purple-gradient white-link" style="padding: 0.5em 1em;">
+                            <a href="/members/create" class="btn purple-gradient white-link" style="padding: 0.5em 1em;">
                             Thêm thành viên
                             </a>
                         </td>
@@ -32,9 +32,9 @@
                         <td><%=mem.name%></td>
                         <td><%=mem.age%></td>
                         <td>
-                            <a href="/member-detail?id=<%=i%>">Chi tiết</a>
+                            <a href="/members/<%=mem.id%>">Chi tiết</a>
                             &nbsp;
-                            <a href="/member-delete?id=<%=i%>">Xóa sổ</a>
+                            <a href="/members/delete/<%=mem.id%>">Xóa sổ</a>
                         </td>
                         </tr>
                     <% }) %>

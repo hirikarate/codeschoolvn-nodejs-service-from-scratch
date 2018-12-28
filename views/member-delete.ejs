@@ -6,8 +6,8 @@
 </head>
 
 <body>
-    <form action="/member-delete" method="POST" class="card">
-        <input type="hidden" value="<%=id %>" name="id">
+    <form action="/members/delete" method="POST" class="card">
+        <input type="hidden" value="<%=member.id %>" name="id">
         <div class="view-cascade red-gradient">
             <h2>Xác nhận xóa: <%=member.name %></h2>
         </div>

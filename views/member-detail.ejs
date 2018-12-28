@@ -8,7 +8,13 @@
 <body>
     <div class="card">
         <div class="view-cascade blue-gradient">
-            <h2>Thông tin cá nhân: <%=member.name %></h2>
+            <h2>
+                <% if (member.id != null) { %>
+                    Thông tin cá nhân: <%=member.name %>
+                <% } else { %>
+                    Thêm thành viên
+                <% } %>
+            </h2>
         </div>
         <div class="card-body">
             <% if (errors && errors.length) { %>
@@ -18,8 +24,12 @@
                 <% }) %>
             </ul>
             <% } %>
-            <form action="/member-detail?id=<%=id %>" method="POST">
-                <input type="hidden" value="<%=id %>" name="id">
+            <% if (member.id != null) { %>
+            <form action="/members/<%=member.id %>" method="POST">
+                <input type="hidden" value="<%=member.id %>" name="id">
+            <% } else { %>
+            <form action="/members/create" method="POST">
+            <% } %>
                 <label for="txtName">Họ tên</label><br>
                 <input type="text" value="<%=member.name %>" name="name" id="txtName" class="form-control"><br>
                 <br>
