@@ -1,13 +1,13 @@
 const { generateFakeData } = require('./members-database')
 
 
-class MemberDAO {
+class MemberRepository {
     
     constructor() {
-        if (MemberDAO.data == null) {
-            MemberDAO.data = generateFakeData()
+        if (MemberRepository.data == null) {
+            MemberRepository.data = generateFakeData()
         }
-        this._members = MemberDAO.data
+        this._members = MemberRepository.data
         this._maxId = Math.max(...this._members.map(m => m.id))
     }
 
@@ -74,4 +74,4 @@ class MemberDAO {
     }
 }
 
-exports.MemberDAO = MemberDAO
+exports.MemberDAO = MemberRepository
