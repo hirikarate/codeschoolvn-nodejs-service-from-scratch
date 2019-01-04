@@ -7,10 +7,21 @@ class MemberDetail {
         this.address = ''
         this.isGraduated = false
         this.faculty = ''
-        this.hobbies = []
+        this.hobbyIDs = []
     }
 }
 exports.MemberDetail = MemberDetail
+
+
+class MemberSummary {
+    constructor() {
+        this.id = 0
+        this.name = ''
+        this.age = 
+        this.hobbyNames = []
+    }
+}
+exports.MemberSummary = MemberSummary
 
 
 class NewMember {
@@ -20,7 +31,7 @@ class NewMember {
         this.address = ''
         this.isGraduated = false
         this.faculty = ''
-        this.hobbies = []
+        this.hobbyIDs = []
     }
 }
 exports.NewMember = NewMember

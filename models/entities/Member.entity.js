@@ -7,7 +7,7 @@ class MemberEntity {
         this.address = ''
         this.isGraduated = false
         this.faculty = ''
-        this.hobbies = []
+        this.hobbyIDs = []
     }
 }
 exports.MemberEntity = MemberEntity

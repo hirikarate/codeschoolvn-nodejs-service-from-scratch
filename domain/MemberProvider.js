@@ -1,18 +1,20 @@
+const { HobbyRepository } = require('../data-access/HobbyRepository')
 const { MemberRepository } = require('../data-access/MemberRepository')
 const { MemberMapper } = require('../models/mappers/MemberMapper')
 
 class MemberProvider {
 
     constructor() {
-        this._repo = new MemberRepository()
+        this._memRepo = new MemberRepository()
+        this._hobRepo = new HobbyRepository()
         this._mapper = new MemberMapper()
     }
 
     /**
      * Fetches all members
      */
-    findAll() {
-        const entities = this._repo.findAll()
+    getAll() {
+        const entities = this._memRepo.findAll()
         const members = this._mapper.fromEntityToMemberDetail(entities)
         return members
     }
@@ -22,10 +24,22 @@ class MemberProvider {
      * otherwise returns `null`.
      * @params {number} id Member ID to find
      */
-    findById(id) {
-        const entity = this._repo.findById(id)
+    getDetails(id) {
+        const entity = this._memRepo.findById(id)
         const member = this._mapper.fromEntityToMemberDetail(entity)
         return member
+    }
+
+    /**
+     * Searches by member ID, return ONE member if found,
+     * otherwise returns `null`.
+     * @params {number} id Member ID to find
+     */
+    getSummary(id) {
+        const entity = this._memRepo.findById(id)
+        const hobbies = this._hobRepo.findByIdMany(entity.hobbyIDs)
+        const memSummary = this._mapper.fromEntityToMemberSummary(entity, hobbies)
+        return memSummary
     }
 
     /**
@@ -33,7 +47,7 @@ class MemberProvider {
      * @params {number} id Member ID to check
      */
     exists(id) {
-        return this._repo.exists(id)
+        return this._memRepo.exists(id)
     }
 
     /**
@@ -42,7 +56,7 @@ class MemberProvider {
      */
     create(newMember) {
         let entity = this._mapper.fromMemberDetailToEntity(newMember)
-        entity = this._repo.create(entity)
+        entity = this._memRepo.create(entity)
         newMember.id = entity.id
         return newMember
     }
@@ -53,7 +67,7 @@ class MemberProvider {
      */
     update(modifiedMember) {
         let entity = this._mapper.fromMemberDetailToEntity(modifiedMember)
-        this._repo.update(entity)
+        this._memRepo.update(entity)
         return modifiedMember
     }
 
@@ -62,7 +76,7 @@ class MemberProvider {
      * @params {number} id Member ID to delete
      */
     delete(id) {
-        return this._repo.delete(id)
+        return this._memRepo.delete(id)
     }
 
 }

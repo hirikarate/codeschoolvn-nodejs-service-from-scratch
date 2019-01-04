@@ -1,6 +1,5 @@
 const dto = require('../DTO/member.dto')
 const { MemberEntity } = require('../entities/Member.entity')
-const Hobby = require('../Hobby.enum')
 const Faculty = require('../Faculty.enum')
 
 
@@ -19,7 +18,7 @@ class MemberMapper {
         entity.address = member.address
         entity.isGraduated = member.isGraduated
         entity.faculty = member.faculty
-        entity.hobbies = member.hobbies
+        entity.hobbyIDs = member.hobbyIDs
         return entity
     }
 
@@ -35,13 +34,26 @@ class MemberMapper {
         detail.address = entity.address
         detail.isGraduated = entity.isGraduated
         detail.faculty = entity.faculty
-        detail.hobbies = entity.hobbies
+        detail.hobbyIDs = entity.hobbyIDs
         return detail
+    }
+
+    fromEntityToMemberSummary(entity, hobbies) {
+        if (!entity) { return null }
+        else if (Array.isArray(entity)) {
+            return entity.map(this.fromEntityToMemberSummary.bind(this))
+        }
+        const summary = new dto.MemberSummary()
+        summary.id = entity.id
+        summary.name = entity.name
+        summary.age = entity.age
+        summary.hobbyNames = hobbies.map(h => h.name)
+        return summary
     }
 
     sanitizeMember(obj) {
         if (!obj) { return null }
-        let { id, name, age, address, isGraduated, faculty, hobbies } = obj
+        let { id, name, age, address, isGraduated, faculty, hobbyIDs } = obj
         const errors = []
 
         id = validateId(id)
@@ -49,7 +61,7 @@ class MemberMapper {
         age = validateAge(age, errors)
         isGraduated = validateGraduated(isGraduated, errors)
         faculty = validateFaculty(faculty, errors)
-        hobbies = validateHobbies(hobbies, errors)
+        hobbyIDs = validateHobbies(hobbyIDs, errors)
 
         if (errors.length) {
             return {
@@ -71,7 +83,7 @@ class MemberMapper {
         mem.address = address
         mem.isGraduated = isGraduated
         mem.faculty = faculty
-        mem.hobbies = hobbies
+        mem.hobbyIDs = hobbyIDs
 
         return {
             errors: null,
@@ -132,10 +144,12 @@ function validateHobbies(hobbies, errors) {
         return hobbies // Hobbies are optional
     }
 
-    const isValidEnum = hobbies.every(hobby => {
-        return Object.values(Hobby).some(h => h.key === hobby)
+    hobbies = hobbies.map(Number)
+    const isValidIDs = hobbies.every(hobbyID => {
+        return Number.isSafeInteger(hobbyID)
     })
-    if (!isValidEnum) {
+
+    if (!isValidIDs) {
         return errors.push('Sở thích không hợp lệ')
     }
 

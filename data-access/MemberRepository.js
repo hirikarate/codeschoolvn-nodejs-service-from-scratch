@@ -1,5 +1,5 @@
 const { MemberEntity } = require('../models/entities/Member.entity')
-const { generateFakeData } = require('./members-database')
+const { generateFakeData } = require('./mock-data/members-database')
 
 class MemberRepository {
     

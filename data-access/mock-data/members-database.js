@@ -1,8 +1,7 @@
-const Hobby = require('../models/Hobby.enum')
-const Faculty = require('../models/Faculty.enum')
+const Faculty = require('../../models/Faculty.enum')
 
 function generateFakeData() {
-    const { MemberMapper } = require('../models/mappers/MemberMapper')
+    const { MemberMapper } = require('../../models/mappers/MemberMapper')
     const mapper = new MemberMapper()
     const from = mapper.sanitizeMember
     return [
@@ -13,7 +12,7 @@ function generateFakeData() {
             address: 'Trần Hưng Đạo, Q.1,\nViệt Nam',
             isGraduated: false,
             faculty: Faculty.IT.key,
-            hobbies: [Hobby.READING.key, Hobby.FOOTBALL.key]
+            hobbyIDs: [1, 3]
         }).data,
         from({
             id: 2,
@@ -22,7 +21,7 @@ function generateFakeData() {
             address: 'Q.2',
             isGraduated: true,
             faculty: null,
-            hobbies: [Hobby.SWIMMING.key, Hobby.TRAVELLING.key]
+            hobbyIDs: [2, 4]
         }).data,
         from({
             id: 3,
@@ -30,7 +29,7 @@ function generateFakeData() {
             age: 28, address: 'Q.3',
             isGraduated: true,
             faculty: Faculty.SALES.key,
-            hobbies: [Hobby.SHOPPING.key, Hobby.READING.key, Hobby.FOOTBALL.key]
+            hobbyIDs: [1, 3, 5]
         }).data,
         from({
             id: 4,
@@ -39,7 +38,7 @@ function generateFakeData() {
             address: 'Q.4',
             isGraduated: false,
             faculty: Faculty.IT.key,
-            hobbies: []
+            hobbyIDs: []
         }).data,
         from({
             id: 5,
@@ -48,7 +47,7 @@ function generateFakeData() {
             address: 'Q.GV',
             isGraduated: false,
             faculty: Faculty.SALES.key,
-            hobbies: [Hobby.SWIMMING.key, Hobby.SHOPPING.key, Hobby.READING.key]
+            hobbyIDs: [1, 2, 5]
         }).data,
         from({
             id: 6,
@@ -57,7 +56,7 @@ function generateFakeData() {
             address: 'Q.PN',
             isGraduated: true,
             faculty: Faculty.ART.key,
-            hobbies: [Hobby.READING.key, Hobby.FOOTBALL.key, Hobby.SHOPPING.key]
+            hobbyIDs: [1, 2, 3]
         }).data,
         from({
             id: 7,
@@ -66,7 +65,7 @@ function generateFakeData() {
             address: 'Q.12',
             isGraduated: false,
             faculty: Faculty.IT.key,
-            hobbies: [Hobby.SWIMMING.key, Hobby.SHOPPING.key, Hobby.TRAVELLING.key]
+            hobbyIDs: [2, 4, 5]
         }).data,
         from({
             id: 8,
@@ -75,7 +74,7 @@ function generateFakeData() {
             address: 'Q.TB',
             isGraduated: false,
             faculty: Faculty.ART.key,
-            hobbies: [Hobby.READING.key, Hobby.FOOTBALL.key]
+            hobbyIDs: [1, 4]
         }).data,
     ]
 }

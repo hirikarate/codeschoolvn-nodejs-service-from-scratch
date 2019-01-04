@@ -56,13 +56,13 @@
                 <br>
                 <br>
                 <label>Sở thích</label><br>
-                <% for (let prop in Hobby) {
-                    const hobby = Hobby[prop]
-                    const selected = member.hobbies.includes(hobby.key) ? 'checked' : ''
+                <% for (let prop in hobbies) {
+                    const hobby = hobbies[prop]
+                    const selected = member.hobbyIDs.includes(hobby.id) ? 'checked' : ''
                 %>
-                    <input type="checkbox" value="<%=hobby.key %>" name="hobbies" id="cb<%=hobby.key%>" <%=selected %> >
-                    <label for="cb<%=hobby.key %>" class="label-check">
-                        <%=hobby.label %>
+                    <input type="checkbox" value="<%=hobby.id %>" name="hobbyIDs" id="cb<%=hobby.id%>" <%=selected %> >
+                    <label for="cb<%=hobby.id %>" class="label-check">
+                        <%=hobby.name %>
                     </label><br>
                 <% } %>
                 <br>

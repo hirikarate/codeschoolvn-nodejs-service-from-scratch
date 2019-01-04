@@ -1,7 +1,7 @@
 const http = require('http')
 
-const Hobby = require('../models/Hobby.enum')
 const Faculty = require('../models/Faculty.enum')
+const { HobbyProvider } = require('../domain/HobbyProvider')
 const { MemberProvider } = require('../domain/MemberProvider')
 const { MemberMapper } = require('../models/mappers/MemberMapper')
 
@@ -9,7 +9,8 @@ const { MemberMapper } = require('../models/mappers/MemberMapper')
 class MemberController {
 
     constructor() {
-        this._provider = new MemberProvider()
+        this._hobProvider = new HobbyProvider()
+        this._memProvider = new MemberProvider()
         this._mapper = new MemberMapper()
     }
 
@@ -17,7 +18,7 @@ class MemberController {
      * Lists all members
      */
     list(req, res) {
-        const members = this._provider.findAll()
+        const members = this._memProvider.getAll()
         const viewModel = {
             title: 'Danh sách thành viên',
             members,
@@ -37,17 +38,19 @@ class MemberController {
         } 
         else { // First visit
             member = {
-                hobbies: [],
+                hobbyIDs: [],
             }
         }
 
-        return res.render('member-detail', {
+        const hobbies = this._hobProvider.getAll()
+        const viewModel = {
             member,
             errors: validationErrors,
-            Hobby,
+            hobbies,
             Faculty,
             title: 'Thêm thành viên',
-        })
+        }
+        return res.render('member-detail', viewModel)
     }
 
     /**
@@ -65,7 +68,7 @@ class MemberController {
         }
 
         // Add to database
-        this._provider.create(member)
+        this._memProvider.create(member)
 
         // Redirects to edit page
         res.redirect(`/members/${member.id}`)
@@ -80,27 +83,29 @@ class MemberController {
         if (reqOrMember instanceof http.IncomingMessage) {
             id = reqOrMember.params.id
 
-            if (Number.isNaN(id) || !this._provider.exists(id)) {
+            if (Number.isNaN(id) || !this._memProvider.exists(id)) {
                 return res.render('error', {
                     title: 'Sự cố',
                     reason: 'Mã thành viên không tồn tại' 
                 })
             }
 
-            member = this._provider.findById(id)
+            member = this._memProvider.getDetails(id)
         }
         else { // submitted form data
             member = reqOrMember
             id = reqOrMember.id
         }
 
-        res.render('member-detail', {
+        const hobbies = this._hobProvider.getAll()
+        const viewModels = {
             member,
             errors: validationErrors,
-            Hobby: await this._loadHobbyFromDb(),
+            hobbies,
             Faculty,
             title: 'Chi tiết',
-        })
+        }
+        res.render('member-detail', viewModels)
     }
 
     /**
@@ -110,21 +115,21 @@ class MemberController {
     saveEdit(req, res) {
         const formData = req.body
         const { id } = formData
-        if (Number.isNaN(id) || !this._provider.exists(id)) {
+        if (Number.isNaN(id) || !this._memProvider.exists(id)) {
             return res.render('error', {
                 title: 'Sự cố',
                 reason: 'Mã thành viên không tồn tại' 
             })
         }
 
-        let member = this._provider.findById(id)
+        let member = this._memProvider.getDetails(id)
         const { errors: valErrors, data } = this._mapper.sanitizeMember(formData)
         if (valErrors) {
             return this.detail(formData, res, valErrors)
         }
 
         member = Object.assign(member, data)
-        this._provider.update(member)
+        this._memProvider.update(member)
         return this.detail(req, res)
     }
 
@@ -136,14 +141,14 @@ class MemberController {
 
         const { id } = req.params
 
-        if (Number.isNaN(id) || !this._provider.exists(id)) {
+        if (Number.isNaN(id) || !this._memProvider.exists(id)) {
             return res.render('error', {
                 title: 'Sự cố',
                 reason: 'Mã thành viên không tồn tại' 
             })
         }
 
-        const member = this._provider.findById(id)
+        const member = this._memProvider.getSummary(id)
         
         res.render('member-delete', {
             member,
@@ -159,20 +164,16 @@ class MemberController {
     delete(req, res) {
         const { id } = req.body
 
-        if (Number.isNaN(id) || !this._provider.exists(id)) {
+        if (Number.isNaN(id) || !this._memProvider.exists(id)) {
             return res.render('error', {
                 title: 'Sự cố',
                 reason: 'Mã thành viên không tồn tại' 
             })
         }
 
-        this._provider.delete(id)
+        this._memProvider.delete(id)
 
         res.redirect('/members')
-    }
-
-    _loadHobbyFromDb() {
-        return Promise.resolve(Hobby)
     }
 }
 
