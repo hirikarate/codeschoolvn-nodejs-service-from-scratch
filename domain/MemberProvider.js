@@ -41,7 +41,7 @@ class MemberProvider {
      * @params {NewMember} New member instance
      */
     create(newMember) {
-        let entity = this._mapper.fromNewMemberToEntity(newMember)
+        let entity = this._mapper.fromMemberDetailToEntity(newMember)
         entity = this._repo.create(entity)
         newMember.id = entity.id
         return newMember
@@ -52,7 +52,7 @@ class MemberProvider {
      * @params {MemberDetail} Modified member instance
      */
     update(modifiedMember) {
-        let entity = this._mapper.fromNewMemberToEntity(modifiedMember)
+        let entity = this._mapper.fromMemberDetailToEntity(modifiedMember)
         this._repo.update(entity)
         return modifiedMember
     }

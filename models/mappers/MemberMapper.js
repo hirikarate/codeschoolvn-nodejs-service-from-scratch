@@ -5,18 +5,21 @@ const Faculty = require('../Faculty.enum')
 
 
 class MemberMapper {
-    fromNewMemberToEntity(newMember) {
-        if (!newMember) { return null }
-        else if (Array.isArray(newMember)) {
-            return newMember.map(this.fromNewMemberToEntity.bind(this))
+    fromMemberDetailToEntity(member) {
+        if (!member) { return null }
+        else if (Array.isArray(member)) {
+            return member.map(this.fromMemberDetailToEntity.bind(this))
         }
         const entity = new MemberEntity()
-        entity.name = newMember.name
-        entity.age = newMember.age
-        entity.address = newMember.address
-        entity.isGraduated = newMember.isGraduated
-        entity.faculty = newMember.faculty
-        entity.hobbies = newMember.hobbies
+        if (member.id){
+            entity.id = member.id
+        }
+        entity.name = member.name
+        entity.age = member.age
+        entity.address = member.address
+        entity.isGraduated = member.isGraduated
+        entity.faculty = member.faculty
+        entity.hobbies = member.hobbies
         return entity
     }
 

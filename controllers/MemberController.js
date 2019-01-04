@@ -18,7 +18,6 @@ class MemberController {
      */
     list(req, res) {
         const members = this._provider.findAll()
-        // console.log({ members })
         res.render('member-list', {
             title: 'Danh sách thành viên',
             members,
@@ -55,7 +54,6 @@ class MemberController {
      * @param {NewMember} req.body Member instance
      */
     saveNew(req, res) {
-        console.log('SAVE NEW')
         const formData = req.body
         
         // Translate raw data to Member type
@@ -66,7 +64,6 @@ class MemberController {
         }
 
         // Add to database
-        console.log({ saving: member })
         this._provider.create(member)
 
         // Redirects to edit page
