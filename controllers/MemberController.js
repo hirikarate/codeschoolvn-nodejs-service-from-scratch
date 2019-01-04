@@ -18,10 +18,11 @@ class MemberController {
      */
     list(req, res) {
         const members = this._provider.findAll()
-        res.render('member-list', {
+        const viewModel = {
             title: 'Danh sách thành viên',
             members,
-        })
+        }
+        res.render('member-list', viewModel)
     }
 
     /**

@@ -2,7 +2,6 @@ const Hobby = require('../models/Hobby.enum')
 const Faculty = require('../models/Faculty.enum')
 
 function generateFakeData() {
-    const { MemberEntity } = require('../models/entities/Member.entity')
     const { MemberMapper } = require('../models/mappers/MemberMapper')
     const mapper = new MemberMapper()
     const from = mapper.sanitizeMember
