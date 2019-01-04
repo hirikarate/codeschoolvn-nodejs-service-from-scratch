@@ -2,9 +2,12 @@ const Hobby = require('../models/Hobby.enum')
 const Faculty = require('../models/Faculty.enum')
 
 function generateFakeData() {
-    const { MemberModel } = require('../models/MemberModel')
+    const { MemberEntity } = require('../models/entities/Member.entity')
+    const { MemberMapper } = require('../models/mappers/MemberMapper')
+    const mapper = new MemberMapper()
+    const from = mapper.sanitizeMember
     return [
-        MemberModel.from({
+        from({
             id: 1,
             name: 'Hoàng Anh',
             age: 25,
@@ -13,7 +16,7 @@ function generateFakeData() {
             faculty: Faculty.IT.key,
             hobbies: [Hobby.READING.key, Hobby.FOOTBALL.key]
         }).data,
-        MemberModel.from({
+        from({
             id: 2,
             name: 'Tấn Đạt',
             age: 22,
@@ -22,7 +25,7 @@ function generateFakeData() {
             faculty: null,
             hobbies: [Hobby.SWIMMING.key, Hobby.TRAVELLING.key]
         }).data,
-        MemberModel.from({
+        from({
             id: 3,
             name: 'Minh Mẫn',
             age: 28, address: 'Q.3',
@@ -30,7 +33,7 @@ function generateFakeData() {
             faculty: Faculty.SALES.key,
             hobbies: [Hobby.SHOPPING.key, Hobby.READING.key, Hobby.FOOTBALL.key]
         }).data,
-        MemberModel.from({
+        from({
             id: 4,
             name: 'Bảo Nam',
             age: 21,
@@ -39,7 +42,7 @@ function generateFakeData() {
             faculty: Faculty.IT.key,
             hobbies: []
         }).data,
-        MemberModel.from({
+        from({
             id: 5,
             name: 'Trung Nhân',
             age: 21,
@@ -48,7 +51,7 @@ function generateFakeData() {
             faculty: Faculty.SALES.key,
             hobbies: [Hobby.SWIMMING.key, Hobby.SHOPPING.key, Hobby.READING.key]
         }).data,
-        MemberModel.from({
+        from({
             id: 6,
             name: 'Quốc Trung',
             age: 21,
@@ -57,7 +60,7 @@ function generateFakeData() {
             faculty: Faculty.ART.key,
             hobbies: [Hobby.READING.key, Hobby.FOOTBALL.key, Hobby.SHOPPING.key]
         }).data,
-        MemberModel.from({
+        from({
             id: 7,
             name: 'Nguyễn Tú',
             age: 20,
@@ -66,7 +69,7 @@ function generateFakeData() {
             faculty: Faculty.IT.key,
             hobbies: [Hobby.SWIMMING.key, Hobby.SHOPPING.key, Hobby.TRAVELLING.key]
         }).data,
-        MemberModel.from({
+        from({
             id: 8,
             name: 'Phạm Tú',
             age: 19,

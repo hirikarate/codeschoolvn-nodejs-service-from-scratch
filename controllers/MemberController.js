@@ -2,24 +2,32 @@ const http = require('http')
 
 const Hobby = require('../models/Hobby.enum')
 const Faculty = require('../models/Faculty.enum')
-const { MemberModel } = require('../models/MemberModel')
+const { MemberProvider } = require('../domain/MemberProvider')
+const { MemberMapper } = require('../models/mappers/MemberMapper')
 
 
 class MemberController {
+
+    constructor() {
+        this._provider = new MemberProvider()
+        this._mapper = new MemberMapper()
+    }
 
     /**
      * Lists all members
      */
     list(req, res) {
+        const members = this._provider.findAll()
+        // console.log({ members })
         res.render('member-list', {
             title: 'Danh sách thành viên',
-            members: MemberModel.findAll()
+            members,
         })
     }
 
     /**
      * Goes to create view
-     * @param {http.IncomingMessage | MemberModel} reqOrMember
+     * @param {http.IncomingMessage | NewMember} reqOrMember
      */
     create(reqOrMember, res, validationErrors = []) {
         let member
@@ -44,14 +52,14 @@ class MemberController {
 
     /**
      * Saves new member
-     * @param {MemberModel} req.body Member instance
+     * @param {NewMember} req.body Member instance
      */
     saveNew(req, res) {
         console.log('SAVE NEW')
         const formData = req.body
         
         // Translate raw data to Member type
-        const { errors: valErrors, data: member } = MemberModel.from(formData)
+        const { errors: valErrors, data: member } = this._mapper.sanitizeMember(formData)
 
         if (valErrors) {
             return this.create(formData, res, valErrors)
@@ -59,7 +67,7 @@ class MemberController {
 
         // Add to database
         console.log({ saving: member })
-        member.save()
+        this._provider.create(member)
 
         // Redirects to edit page
         res.redirect(`/members/${member.id}`)
@@ -67,21 +75,21 @@ class MemberController {
 
     /**
      * Goes to detail view
-     * @param {http.IncomingMessage | MemberModel} reqOrMember
+     * @param {http.IncomingMessage | MemberDetail} reqOrMember
      */
     async detail(reqOrMember, res, validationErrors = []) {
         let member, id
         if (reqOrMember instanceof http.IncomingMessage) {
             id = reqOrMember.params.id
 
-            if (Number.isNaN(id) || !MemberModel.exists(id)) {
+            if (Number.isNaN(id) || !this._provider.exists(id)) {
                 return res.render('error', {
                     title: 'Sự cố',
                     reason: 'Mã thành viên không tồn tại' 
                 })
             }
 
-            member = MemberModel.findById(id)
+            member = this._provider.findById(id)
         }
         else { // submitted form data
             member = reqOrMember
@@ -99,26 +107,26 @@ class MemberController {
 
     /**
      * Saves modified member
-     * @param {MemberModel} req.body Member instance
+     * @param {MemberDetail} req.body Member instance
      */
     saveEdit(req, res) {
         const formData = req.body
         const { id } = formData
-        if (Number.isNaN(id) || !MemberModel.exists(id)) {
+        if (Number.isNaN(id) || !this._provider.exists(id)) {
             return res.render('error', {
                 title: 'Sự cố',
                 reason: 'Mã thành viên không tồn tại' 
             })
         }
 
-        let member = MemberModel.findById(id)
-        const { errors: valErrors, data } = MemberModel.from(formData)
+        let member = this._provider.findById(id)
+        const { errors: valErrors, data } = this._mapper.sanitizeMember(formData)
         if (valErrors) {
             return this.detail(formData, res, valErrors)
         }
 
         member = Object.assign(member, data)
-        member.save()
+        this._provider.update(member)
         return this.detail(req, res)
     }
 
@@ -130,14 +138,14 @@ class MemberController {
 
         const { id } = req.params
 
-        if (Number.isNaN(id) || !MemberModel.exists(id)) {
+        if (Number.isNaN(id) || !this._provider.exists(id)) {
             return res.render('error', {
                 title: 'Sự cố',
                 reason: 'Mã thành viên không tồn tại' 
             })
         }
 
-        const member = MemberModel.findById(id)
+        const member = this._provider.findById(id)
         
         res.render('member-delete', {
             member,
@@ -153,14 +161,14 @@ class MemberController {
     delete(req, res) {
         const { id } = req.body
 
-        if (Number.isNaN(id) || !MemberModel.exists(id)) {
+        if (Number.isNaN(id) || !this._provider.exists(id)) {
             return res.render('error', {
                 title: 'Sự cố',
                 reason: 'Mã thành viên không tồn tại' 
             })
         }
 
-        MemberModel.delete(id)
+        this._provider.delete(id)
 
         res.redirect('/members')
     }

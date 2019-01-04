@@ -1,5 +1,5 @@
+const { MemberEntity } = require('../models/entities/Member.entity')
 const { generateFakeData } = require('./members-database')
-
 
 class MemberRepository {
     
@@ -39,19 +39,25 @@ class MemberRepository {
      * Adds new member
      * @params {MemberModel} New member instance
      */
-    create(member) {
-        member.id = this._nextId()
-        this._members.push(member)
-        return member
+    create(memberEntity) {
+        if (! (memberEntity instanceof MemberEntity)) {
+            throw new Error('Must be of type MemberEntity')
+        }
+        memberEntity.id = this._nextId()
+        this._members.push(memberEntity)
+        return memberEntity
     }
 
     /**
      * Updates existing member
      * @params {MemberModel} Modified member instance
      */
-    update(member) {
-        const found = this._members.find(m => m.id == member.id)
-        Object.assign(found, member)
+    update(memberEntity) {
+        if (! (memberEntity instanceof MemberEntity)) {
+            throw new Error('Must be of type MemberEntity')
+        }
+        const found = this._members.find(m => m.id == memberEntity.id)
+        Object.assign(found, memberEntity)
     }
 
     /**
@@ -74,4 +80,4 @@ class MemberRepository {
     }
 }
 
-exports.MemberDAO = MemberRepository
+module.exports = { MemberRepository }
