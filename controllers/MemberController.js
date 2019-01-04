@@ -1,8 +1,8 @@
 const http = require('http')
 
 const Faculty = require('../models/Faculty.enum')
-const { HobbyProvider } = require('../domain/HobbyProvider')
-const { MemberProvider } = require('../domain/MemberProvider')
+const { HobbyProvider } = require('../business/HobbyProvider')
+const { MemberProvider } = require('../business/MemberProvider')
 const { MemberMapper } = require('../models/mappers/MemberMapper')
 
 
@@ -149,12 +149,13 @@ class MemberController {
         }
 
         const member = this._memProvider.getSummary(id)
-        
-        res.render('member-delete', {
+        const viewModel = {
             member,
             backUrl: req.headers.referer,
             title: 'Xác nhận xóa',
-        })
+        }
+        
+        res.render('member-delete', viewModel)
     }
 
     /**
