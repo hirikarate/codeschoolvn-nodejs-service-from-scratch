@@ -27,6 +27,9 @@ function handleRequest (ControllerClass, action) {
         res.on('error', handleUnexpectedError)
         const controller = new ControllerClass()
         controller[action](req, res)
+        // controller.foo(req, res)
+        // fName = 'foo'
+        // controller[fName]
     }
 }
 
